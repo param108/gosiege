@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"github.com/param108/siege/siege"
+	"github.com/param108/gosiege/siege"
 )
 
 func ParseConfig(path string) (*siege.SiegeConfig, error) {

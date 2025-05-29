@@ -7,8 +7,8 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
-	"github.com/param108/siege/config"
-	"github.com/param108/siege/siege"
+	"github.com/param108/gosiege/config"
+	"github.com/param108/gosiege/siege"
 	"syscall"
 
 	"github.com/urfave/cli/v3"

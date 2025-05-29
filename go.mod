@@ -1,4 +1,4 @@
-module github.com/param108/siege
+module github.com/param108/gosiege
 
 go 1.23.0
 
