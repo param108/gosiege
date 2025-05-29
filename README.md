@@ -9,16 +9,16 @@ To build the Siege tool, ensure you have Go installed on your system. Follow the
 
 ```
 ## Clone the repository
-git clone https://github.com/param108/siege.git
+git clone https://github.com/param108/gosiege.git
 
 # Navigate to the project directory
-cd siege
+cd gosiege
 
 # Build the project
 make build
 ```
 
-After building, the executable ~siege~ will be available in the project directory.
+After building, the executable `sg` will be available in the project directory.
 
 ## Command Options
 The Siege tool (`sg`) provides the following commands and options:
@@ -93,7 +93,7 @@ The Siege tool provides detailed statistics after the test. Example output:
 ```
 Final Stats:
 Max RPS: 100.00
-Current Requests: 75.00
+Current Requests: 1265
 Max Concurrents: 50
 2xx Responses: 1200
 4xx Responses: 50
