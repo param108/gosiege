@@ -26,10 +26,10 @@ The Siege tool (`sg`) provides the following commands and options:
   - Runs the siege test with the provided configuration.
 
 + **Options:**
-  1. ~--config~ or ~-c~: Path to the configuration file (mandatory).
-  2. ~--max-rps~ or ~-r~: Maximum requests per second (optional).
-  3. ~--max-concurrent~ or ~-m~: Maximum number of concurrent requests (optional).
-  4. ~--duration~ or ~-d~: Duration of the siege in seconds (default: 60 seconds).
+  1. --config or -c: Path to the configuration file (mandatory).
+  2. --max-rps or -r: Maximum requests per second (optional).
+  3. --max-concurrent or -m: Maximum number of concurrent requests (optional).
+  4. --duration or -d: Duration of the siege in seconds (default: 60 seconds).
 
 ## Usage Examples
 Below are examples of how to use the Siege tool:
