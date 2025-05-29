@@ -1,6 +1,7 @@
-This document provides information about the Siege command-line tool, including how to build, use, and configure it.
+# GoSiege
+This document provides information about the Siege command-line tool (sg), including how to build, use, and configure it.
 
-# Overview
+## Overview
 Siege is a command-line tool designed to perform load testing by simulating HTTP requests. It allows users to specify configurations such as maximum requests per second, maximum concurrent requests, and test duration.
 
 ## Building the Project
