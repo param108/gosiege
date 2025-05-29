@@ -1,0 +1,35 @@
+{
+  "urls": [
+    {
+      "url": "http://example.com/api/resource",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer randomtoken123",
+        "Accept": "application/json"
+      },
+      "body": "",
+      "repeat": 5
+    },
+    {
+      "url": "http://test.com/api/data",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"key\": \"value\"}",
+      "repeat": 3
+    },
+    {
+      "url": "http://randomsite.org/api/submit",
+      "method": "PUT",
+      "headers": {
+        "User-Agent": "SiegeClient/1.0"
+      },
+      "body": "{\"update\": \"true\"}",
+      "repeat": 2
+    }
+  ],
+  "duration": 45,
+  "max_concurrent": 100,
+  "max_rps": 200
+}

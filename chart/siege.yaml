@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: siege
+  namespace: esd
+  labels:
+    app: siege
+    release: siege
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: siege
+      release: siege
+  template:
+    metadata:
+      labels:
+        app: siege
+        release: siege
+    spec:
+      containers:
+      - name: sleep-container
+        image: harbor.eencloud.com/test/siege:latest
+      nodeSelector:
+        role: server
