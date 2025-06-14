@@ -69,7 +69,8 @@ The configuration file specifies the parameters for the siege test. It should be
         "Content-Type": "application/json"
       },
       "body": "{\"key\": \"value\"}",
-      "repeat": 3
+      "repeat": 3,
+      "chunked": true
     },
     {
       "url": "http://randomsite.org/api/submit",

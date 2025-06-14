@@ -1,8 +1,10 @@
 package siege
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"math/rand"
 	"net/http"
 	"sync"
@@ -17,6 +19,7 @@ type SiegeUrl struct {
 	Headers map[string]string `json:"headers"` // HTTP headers
 	Body    string            `json:"body"`    // Request body for POST/PUT requests
 	Repeat  int               `json:"repeat"`  // Number of times to repeat the request
+	Chunked bool              `json:"chunked"` // Whether the request is chunked
 }
 
 type SiegeConfig struct {
@@ -104,6 +107,7 @@ func (s *Siege) expandUrlList() []*SiegeUrl {
 				Headers: url.Headers,
 				Body:    url.Body,
 				Repeat:  1, // Each expanded URL is repeated once
+				Chunked: url.Chunked,
 			})
 		}
 	}
@@ -145,22 +149,73 @@ func (s *Siege) makeCall(url *SiegeUrl, stats chan int) (*http.Response, error) 
 		stats <- DEC // Decrement the current concurrent requests count
 	}()
 
-	req, err := http.NewRequest(url.Method, url.Url, nil)
-	if err != nil {
-		return nil, err
+	body := url.Body
+	pr, pw := io.Pipe()
+
+	var callRequest *http.Request
+	if len(body) > 0 && (url.Method == http.MethodPost || url.Method == http.MethodPut) {
+		// If the method is POST or PUT, we can set the body
+		if url.Chunked {
+			req, err := http.NewRequest(url.Method, url.Url, pr)
+			if err != nil {
+				return nil, err
+			}
+			callRequest = req
+		} else {
+			req, err := http.NewRequest(url.Method, url.Url, bytes.NewReader([]byte(body)))
+			if err != nil {
+				return nil, err
+			}
+			callRequest = req
+		}
+	} else {
+		req, err := http.NewRequest(url.Method, url.Url, nil)
+		if err != nil {
+			return nil, err
+		}
+		callRequest = req
 	}
 
 	// Set headers if any
 	for key, value := range url.Headers {
-		req.Header.Set(key, value)
+		callRequest.Header.Set(key, value)
 	}
 
-	// If the method is POST or PUT, set the body
-	if url.Method == http.MethodPost || url.Method == http.MethodPut {
-		req.Body = http.NoBody // Replace with actual body if needed
-	}
+	if url.Chunked && (url.Method == http.MethodPost || url.Method == http.MethodPut) {
+		// If the request is chunked, set the Transfer-Encoding header
+		callRequest.Header.Set("Transfer-Encoding", "chunked")
 
-	return client.Do(req)
+		go func() {
+			data := []byte(body)
+			start := 0
+			chunkSize := 1024 // Size of each chunk in bytes
+
+			for start < len(data) {
+				end := start + chunkSize
+				if end > len(data) {
+					end = len(data)
+				}
+				chunk := data[start:end]
+				start = end
+				// Write the chunk to the pipe writer
+				// This simulates chunked transfer encoding
+				_, err := pw.Write(chunk)
+				if err != nil {
+					pw.CloseWithError(err) // Close the pipe with an error if write fails
+					fmt.Printf("Error writing chunk: %v\n", err)
+					return
+				}
+				pw.Write([]byte("\r\n")) // Write a newline to separate chunks
+				// Flush the pipe writer to ensure the chunk is sent
+				time.Sleep(1 * time.Second) // Simulate delay between chunks
+			}
+			pw.Close() // Close the pipe writer when done
+		}()
+
+		return client.Do(callRequest) // Use the context for cancellation
+	} else {
+		return client.Do(callRequest)
+	}
 }
 
 func (s *Siege) Run(stats chan int) {
@@ -185,9 +240,8 @@ func (s *Siege) Run(stats chan int) {
 					continue
 				}
 
-
 				stats <- resp.StatusCode // Send the status code to the stats channel
-				resp.Body.Close() // Ensure response body is closed
+				resp.Body.Close()        // Ensure response body is closed
 				// Process the response (e.g., log status code, etc.)
 				// For now, just print the status code
 			}
